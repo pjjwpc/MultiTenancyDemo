@@ -10,6 +10,8 @@ namespace MultiTenancyDemo.Data
         public string Image{get;set;}
         public int TenancyId { get ;set; }
 
+        public TenantInfo TenantInfo{get;set;}
+
         public GoodsStatus Status{get;set;}
     }
 }
