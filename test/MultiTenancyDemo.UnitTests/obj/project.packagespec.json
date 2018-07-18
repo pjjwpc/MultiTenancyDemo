@@ -1,0 +1,55 @@
+﻿{
+  "version": "1.0.0",
+  "restore": {
+    "projectUniqueName": "/home/wangpc/WorkSpace/31Huiyi/MultiTenancyDemo/test/MultiTenancyDemo.UnitTests/MultiTenancyDemo.UnitTests.csproj",
+    "projectName": "MultiTenancyDemo.UnitTests",
+    "projectPath": "/home/wangpc/WorkSpace/31Huiyi/MultiTenancyDemo/test/MultiTenancyDemo.UnitTests/MultiTenancyDemo.UnitTests.csproj",
+    "outputPath": "/home/wangpc/WorkSpace/31Huiyi/MultiTenancyDemo/test/MultiTenancyDemo.UnitTests/obj/",
+    "projectStyle": "PackageReference",
+    "fallbackFolders": [
+      "/usr/share/dotnet/sdk/NuGetFallbackFolder"
+    ],
+    "originalTargetFrameworks": [
+      "netcoreapp2.1"
+    ],
+    "frameworks": {
+      "netcoreapp2.1": {
+        "projectReferences": {}
+      }
+    },
+    "warningProperties": {
+      "warnAsError": [
+        "NU1605"
+      ]
+    }
+  },
+  "frameworks": {
+    "netcoreapp2.1": {
+      "dependencies": {
+        "Microsoft.NET.Test.Sdk": {
+          "target": "Package",
+          "version": "[15.7.0, )"
+        },
+        "Microsoft.NETCore.App": {
+          "suppressParent": "All",
+          "target": "Package",
+          "version": "[2.1.0, )",
+          "autoReferenced": true
+        },
+        "xunit": {
+          "target": "Package",
+          "version": "[2.3.1, )"
+        },
+        "xunit.runner.visualstudio": {
+          "target": "Package",
+          "version": "[2.3.1, )"
+        }
+      },
+      "imports": [
+        "net461"
+      ],
+      "assetTargetFallback": true,
+      "warn": true
+    }
+  }
+}
