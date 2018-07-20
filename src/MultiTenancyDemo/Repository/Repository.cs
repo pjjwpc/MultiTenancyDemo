@@ -2,12 +2,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MultiTenancyDemo.Repository
 {
-    public class Repository<TEntity>:IRepository<TEntity>
+    public class Repository<TDbContext,TEntity,TKey>:IRepository<TDbContext,TEntity,TKey>
+    where TDbContext:DbContext
     {
-        private readonly DbContext _dbContenxt;
-        public Repository(DbContext dbContext)
+        private readonly IDbContextProvider<TDbContext> _dbContenxtProvider;
+        public Repository(IDbContextProvider<TDbContext> dbContenxtProvider)
         {
-            this._dbContenxt=dbContext;
+            this._dbContenxtProvider=dbContenxtProvider;
         }
 
 

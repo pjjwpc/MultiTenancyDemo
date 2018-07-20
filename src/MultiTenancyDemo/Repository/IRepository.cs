@@ -1,6 +1,6 @@
 namespace MultiTenancyDemo.Repository
 {
-    public interface IRepository<TEntity>
+    public interface IRepository<TDbContext,TEntity,TKey>
     {
          
     }
