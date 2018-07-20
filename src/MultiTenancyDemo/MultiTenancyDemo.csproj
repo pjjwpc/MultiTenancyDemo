@@ -3,9 +3,12 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="CacheManager.Core" Version="1.1.2" />
+    <PackageReference Include="CacheManager.Microsoft.Extensions.Configuration" Version="1.1.2" />
+    <PackageReference Include="CacheManager.Serialization.Json" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.1.1" />
-    <PackageReference Include="StackExchange.Redis" Version="2.0.0-alpha.200" />
+    <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
   </ItemGroup>
 </Project>

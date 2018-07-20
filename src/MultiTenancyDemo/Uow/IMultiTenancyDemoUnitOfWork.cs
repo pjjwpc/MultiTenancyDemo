@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace MultiTenancyDemo.Uow
 {
@@ -8,6 +9,6 @@ namespace MultiTenancyDemo.Uow
 
         Task SaveChangesAsync();
 
-        TDbContext GetDbContext<TDbContext>();
+        TDbContext GetDbContext<TDbContext>() where TDbContext : DbContext;
     }
 }

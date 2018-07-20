@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using MultiTenancyDemo.Data;
 
 namespace MultiTenancyDemo.Repository
@@ -13,7 +12,9 @@ namespace MultiTenancyDemo.Repository
         }
     }
     
-    public class MultiTenantRepositoryBase<TEntity, TKey> : Repository.Repository<MultiTenancyDemo.Data.MultiTenancyDbContext, TEntity, TKey>, IMultiTenantRepositoryBase<TEntity, TKey>
+    public class MultiTenantRepositoryBase<TEntity, TKey> 
+        : Repository<MultiTenancyDbContext, TEntity, TKey>, 
+          IMultiTenantRepositoryBase<TEntity, TKey>
     {
         public MultiTenantRepositoryBase(IDbContextProvider<MultiTenancyDbContext> dbContenxtProvider) 
             : base(dbContenxtProvider)

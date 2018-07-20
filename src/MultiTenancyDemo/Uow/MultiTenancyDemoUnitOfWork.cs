@@ -1,19 +1,25 @@
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MultiTenancyDemo.Data;
+using CacheManager.Core;
 
 namespace MultiTenancyDemo.Uow
 {
     public class MultiTenancyDemoUnitOfWork:IMultiTenancyDemoUnitOfWork
     {
+        private readonly ICacheManager<Tenant> _cacheManager;
+
         /// <summary>
         /// 当前活动的DbContext
         /// </summary>
-        private Dictionary<string,DbContext> ActiveDbContext;
+        public Dictionary<string,DbContext> ActiveDbContext;
         //private readonly 
 
-        public MultiTenancyDemoUnitOfWork()
+        public MultiTenancyDemoUnitOfWork(ICacheManager<Tenant> cacheManager)
         {
+            this._cacheManager = cacheManager;
+
             ActiveDbContext=new Dictionary<string,DbContext>();
         }
 
@@ -61,11 +67,14 @@ namespace MultiTenancyDemo.Uow
         /// <typeparam name="TDbContext"></typeparam>
         /// <returns></returns>
         public TDbContext GetDbContext<TDbContext>()
+                where TDbContext:DbContext
         {
             if(TenantId.HasValue)
             {
-
-            }else
+              Tenant tenant=  _cacheManager.Get(TenantId.ToString());
+               //new DbContext(new DbContextOptions<TDbContext>().);
+            }
+            else
             {
 
             }
