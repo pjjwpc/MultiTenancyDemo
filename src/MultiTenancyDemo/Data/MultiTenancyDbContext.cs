@@ -15,7 +15,7 @@ namespace MultiTenancyDemo.Data
 
         public DbSet<Order> Order{get;set;}
         
-        public DbSet<TenantInfo> Tenant { get; set; }
+        public DbSet<Tenant> Tenant { get; set; }
         
         public MultiTenancyDbContext(DbContextOptions<MultiTenancyDbContext> options):base(options)
         {

@@ -35,7 +35,7 @@ namespace MultiTenancyDemo
 
             services.AddDbContext<MultiTenancyDbContext>(options=>
             {
-                options.UseMySql("server=localhost;uid=root;pwd=qwe123,.,.;database=MultiTenancyDemo;SslMode=none");
+                options.UseMySql("server=localhost;uid=root;pwd=qwe123,.,.;database=MultiTenancy;SslMode=none");
             });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }

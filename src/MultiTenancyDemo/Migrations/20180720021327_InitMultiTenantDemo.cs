@@ -1,50 +1,31 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace MultiTenancyDemo.Migrations
 {
-    public partial class InitMultiTenancyDemo : Migration
+    public partial class InitMultiTenantDemo : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "TenantInfo",
+                name: "Tenants",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(maxLength: 200, nullable: true),
                     TenantType = table.Column<int>(nullable: false),
-                    Connection = table.Column<string>(nullable: true),
-                    TenantDbType = table.Column<int>(nullable: false)
+                    Connection = table.Column<string>(maxLength: 200, nullable: true),
+                    TenantDbType = table.Column<int>(nullable: false),
+                    IsActive = table.Column<bool>(nullable: false),
+                    IsDeleted = table.Column<bool>(nullable: false),
+                    CreateTime = table.Column<DateTime>(nullable: false),
+                    DeleteTime = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TenantInfo", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Goods",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: true),
-                    Price = table.Column<double>(nullable: false),
-                    Image = table.Column<string>(nullable: true),
-                    TenancyId = table.Column<int>(nullable: false),
-                    TenantInfoId = table.Column<int>(nullable: true),
-                    Status = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Goods", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Goods_TenantInfo_TenantInfoId",
-                        column: x => x.TenantInfoId,
-                        principalTable: "TenantInfo",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                    table.PrimaryKey("PK_Tenants", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -54,35 +35,71 @@ namespace MultiTenancyDemo.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: true),
-                    TenancyId = table.Column<int>(nullable: false),
-                    Status = table.Column<int>(nullable: false)
+                    Status = table.Column<int>(nullable: false),
+                    TenantId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_User", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_User_TenantInfo_TenancyId",
-                        column: x => x.TenancyId,
-                        principalTable: "TenantInfo",
+                        name: "FK_User_Tenants_TenantId",
+                        column: x => x.TenantId,
+                        principalTable: "Tenants",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Order",
+                name: "Goods",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    TenancyId = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(maxLength: 200, nullable: true),
+                    Price = table.Column<double>(nullable: false),
+                    Image = table.Column<string>(nullable: true),
                     UserId = table.Column<int>(nullable: false),
+                    TenantId = table.Column<int>(nullable: false),
+                    Status = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Goods", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Goods_Tenants_TenantId",
+                        column: x => x.TenantId,
+                        principalTable: "Tenants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Goods_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Orders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    UserId = table.Column<int>(nullable: false),
+                    TenantId = table.Column<int>(nullable: false),
                     OrderDes = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Order", x => x.Id);
+                    table.PrimaryKey("PK_Orders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Order_User_UserId",
+                        name: "FK_Orders_Tenants_TenantId",
+                        column: x => x.TenantId,
+                        principalTable: "Tenants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Orders_User_UserId",
                         column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "Id",
@@ -95,18 +112,28 @@ namespace MultiTenancyDemo.Migrations
                 column: "Name");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Goods_TenantInfoId",
+                name: "IX_Goods_TenantId",
                 table: "Goods",
-                column: "TenantInfoId");
+                column: "TenantId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Order_UserId_TenancyId",
-                table: "Order",
-                columns: new[] { "UserId", "TenancyId" });
+                name: "IX_Goods_UserId",
+                table: "Goods",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TenantInfo_Name",
-                table: "TenantInfo",
+                name: "IX_Orders_TenantId",
+                table: "Orders",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_UserId",
+                table: "Orders",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tenants_Name",
+                table: "Tenants",
                 column: "Name");
 
             migrationBuilder.CreateIndex(
@@ -115,10 +142,9 @@ namespace MultiTenancyDemo.Migrations
                 column: "Name");
 
             migrationBuilder.CreateIndex(
-                name: "IX_User_TenancyId",
+                name: "IX_User_TenantId",
                 table: "User",
-                column: "TenancyId",
-                unique: true);
+                column: "TenantId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -127,13 +153,13 @@ namespace MultiTenancyDemo.Migrations
                 name: "Goods");
 
             migrationBuilder.DropTable(
-                name: "Order");
+                name: "Orders");
 
             migrationBuilder.DropTable(
                 name: "User");
 
             migrationBuilder.DropTable(
-                name: "TenantInfo");
+                name: "Tenants");
         }
     }
 }

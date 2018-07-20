@@ -24,21 +24,24 @@ namespace MultiTenancyDemo.Migrations
 
                     b.Property<string>("Image");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasMaxLength(200);
 
                     b.Property<double>("Price");
 
                     b.Property<int>("Status");
 
-                    b.Property<int>("TenancyId");
+                    b.Property<int>("TenantId");
 
-                    b.Property<int?>("TenantInfoId");
+                    b.Property<int>("UserId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Name");
 
-                    b.HasIndex("TenantInfoId");
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Goods");
                 });
@@ -50,25 +53,37 @@ namespace MultiTenancyDemo.Migrations
 
                     b.Property<string>("OrderDes");
 
-                    b.Property<int>("TenancyId");
+                    b.Property<int>("TenantId");
 
                     b.Property<int>("UserId");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId", "TenancyId");
+                    b.HasIndex("TenantId");
 
-                    b.ToTable("Order");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("MultiTenancyDemo.Data.TenantInfo", b =>
+            modelBuilder.Entity("MultiTenancyDemo.Data.Tenant", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Connection");
+                    b.Property<string>("Connection")
+                        .HasMaxLength(200);
 
-                    b.Property<string>("Name");
+                    b.Property<DateTime>("CreateTime");
+
+                    b.Property<DateTime>("DeleteTime");
+
+                    b.Property<bool>("IsActive");
+
+                    b.Property<bool>("IsDeleted");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(200);
 
                     b.Property<int>("TenantDbType");
 
@@ -78,7 +93,7 @@ namespace MultiTenancyDemo.Migrations
 
                     b.HasIndex("Name");
 
-                    b.ToTable("TenantInfo");
+                    b.ToTable("Tenants");
                 });
 
             modelBuilder.Entity("MultiTenancyDemo.Data.User", b =>
@@ -90,27 +105,37 @@ namespace MultiTenancyDemo.Migrations
 
                     b.Property<int>("Status");
 
-                    b.Property<int>("TenancyId");
+                    b.Property<int>("TenantId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Name");
 
-                    b.HasIndex("TenancyId")
-                        .IsUnique();
+                    b.HasIndex("TenantId");
 
                     b.ToTable("User");
                 });
 
             modelBuilder.Entity("MultiTenancyDemo.Data.Goods", b =>
                 {
-                    b.HasOne("MultiTenancyDemo.Data.TenantInfo", "TenantInfo")
+                    b.HasOne("MultiTenancyDemo.Data.Tenant", "Tenant")
                         .WithMany()
-                        .HasForeignKey("TenantInfoId");
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("MultiTenancyDemo.Data.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("MultiTenancyDemo.Data.Order", b =>
                 {
+                    b.HasOne("MultiTenancyDemo.Data.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("MultiTenancyDemo.Data.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
@@ -119,9 +144,9 @@ namespace MultiTenancyDemo.Migrations
 
             modelBuilder.Entity("MultiTenancyDemo.Data.User", b =>
                 {
-                    b.HasOne("MultiTenancyDemo.Data.TenantInfo", "TenantInfo")
-                        .WithOne("User")
-                        .HasForeignKey("MultiTenancyDemo.Data.User", "TenancyId")
+                    b.HasOne("MultiTenancyDemo.Data.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

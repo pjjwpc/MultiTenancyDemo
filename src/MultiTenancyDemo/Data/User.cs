@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MultiTenancyDemo.Data
 {
@@ -8,11 +9,12 @@ namespace MultiTenancyDemo.Data
 
         public string Name { get; set; }
 
-        public int TenancyId { get ;set; }
-
         public UserStatus Status{get;set;}
-        
-        public TenantInfo TenantInfo { get; set; }
+
+        public int TenantId{get;set;}
+
+        [ForeignKey("TenantId")]
+        public Tenant Tenant{get;set;}
         
         public IList<Order> Orders { get; set; }
     }

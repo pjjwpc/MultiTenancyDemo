@@ -2,6 +2,6 @@ namespace MultiTenancyDemo.Data
 {
     public interface IMustHaveTenant
     {
-        int TenancyId{get;set;}
+        int TenantId{get;set;}
     }
 }
