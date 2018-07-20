@@ -29,7 +29,7 @@ namespace MultiTenancyDemo.DbContextProvider
         /// <returns></returns>
         private TDbContext GetOrCreateDbContext()
         {
-            return _multiTenancyUnitOfWork.GetDbContext<TDbContext>();
+            return _multiTenancyUnitOfWork.GetDbContext<TDbContext>(null);
         }
     }
 }

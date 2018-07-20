@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MultiTenancyDemo.Data;
 using CacheManager.Core;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MultiTenancyDemo.Uow
 {
@@ -13,13 +14,16 @@ namespace MultiTenancyDemo.Uow
         /// <summary>
         /// 当前活动的DbContext
         /// </summary>
-        public Dictionary<string,DbContext> ActiveDbContext;
+        public IDictionary<string,DbContext> ActiveDbContext;
+
+        private readonly IServiceCollection _serviceCollection;
+        
         //private readonly 
 
-        public MultiTenancyDemoUnitOfWork(ICacheManager<Tenant> cacheManager)
+        public MultiTenancyDemoUnitOfWork(ICacheManager<Tenant> cacheManager,IServiceCollection service)
         {
             this._cacheManager = cacheManager;
-
+            this._serviceCollection=service;
             ActiveDbContext=new Dictionary<string,DbContext>();
         }
 
@@ -66,19 +70,27 @@ namespace MultiTenancyDemo.Uow
         /// </summary>
         /// <typeparam name="TDbContext"></typeparam>
         /// <returns></returns>
-        public TDbContext GetDbContext<TDbContext>()
+        public TDbContext GetDbContext<TDbContext>(MultiTenantType? multiTenantType)
                 where TDbContext:DbContext
         {
-            if(TenantId.HasValue)
+            DbContext dbContext;
+            if(multiTenantType.HasValue&&multiTenantType.Value== MultiTenantType.Tenant
+                && TenantId.HasValue&&TenantId>0)
             {
               Tenant tenant=  _cacheManager.Get(TenantId.ToString());
-               //new DbContext(new DbContextOptions<TDbContext>().);
+              var dbOptionBuilder=new DbContextOptionsBuilder<TDbContext>();
+              var dbOptions= dbOptionBuilder.UseMySql(tenant.Connection);
+               dbContext=  new DbContext(dbOptions.Options);
+               ActiveDbContext[tenant.Connection]=dbContext;
             }
+              
+            
             else
             {
-
+               dbContext= _serviceCollection.BuildServiceProvider().GetService<DbContext>();
+              // ActiveDbContext[]
             }
-            return default(TDbContext);
+            return (TDbContext)dbContext;
         }
     }
 }
