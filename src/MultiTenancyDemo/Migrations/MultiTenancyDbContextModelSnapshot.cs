@@ -78,6 +78,8 @@ namespace MultiTenancyDemo.Migrations
 
                     b.Property<DateTime>("DeleteTime");
 
+                    b.Property<string>("HostName");
+
                     b.Property<bool>("IsActive");
 
                     b.Property<bool>("IsDeleted");

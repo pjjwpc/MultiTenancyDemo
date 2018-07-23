@@ -2,10 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using MultiTenancyDemo.Uow;
 
-namespace MultiTenancyDemo.DbContextProvider
+namespace MultiTenancyDemo
 {
     public class DbContextProvider<TDbContext> : IDbContextProvider<TDbContext>
-    where TDbContext : DbContext
+        where TDbContext : DbContext
     {
         private readonly IMultiTenancyDemoUnitOfWork _multiTenancyUnitOfWork;
         

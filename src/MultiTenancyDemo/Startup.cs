@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MultiTenancyDemo.Data;
-using MySql;
-using Microsoft.EntityFrameworkCore;
+using MultiTenancyDemo.Middleware;
+using MultiTenancyDemo.Repository;
+using MultiTenancyDemo.Uow;
+
 namespace MultiTenancyDemo
 {
     public class Startup
@@ -33,10 +31,18 @@ namespace MultiTenancyDemo
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            services.AddCacheManagerConfiguration(Configuration);
+            services.AddScoped<IMultiTenancyDemoUnitOfWork,MultiTenancyDemoUnitOfWork>();
             services.AddDbContext<MultiTenancyDbContext>(options=>
             {
                 options.UseMySql("server=localhost;uid=root;pwd=qwe123,.,.;database=MultiTenancy;SslMode=none");
             });
+            services.AddSingleton(typeof(MultiTenantType),MultiTenantType.Host);
+            services.AddScoped(typeof(IDbContextProvider<>),typeof(DbContextProvider<>));
+            services.AddScoped(typeof(IRepository<,,>),typeof(Repository<,,>));
+            services.AddScoped(typeof(IMultiTenantRepositoryBase<,>),typeof(MultiTenantRepositoryBase<,>));
+            services.AddScoped(typeof(IMultiTenantRepositoryBase<>),typeof(MultiTenantRepositoryBase<>));
+            services.AddCacheManager();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
@@ -56,6 +62,7 @@ namespace MultiTenancyDemo
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            app.UseMiddleware<MultiTenantMiddleware>();
 
             app.UseMvc(routes =>
             {

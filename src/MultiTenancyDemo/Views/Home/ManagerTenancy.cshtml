@@ -1,14 +1,44 @@
-﻿@model IList<MultiTenancyDemo.Data.Tenant>
-
+﻿@{
+    Layout=null;
+}
 <!DOCTYPE html>
 
 <html>
 <head>
     <title>租户信息管理</title>
 </head>
+<environment include="Development">
+    <link rel="stylesheet" href="~/lib/easyui/themes/icon.css" />
+     <link rel="stylesheet" href="~/lib/easyui/themes/metro/easyui.css" />
+</environment>
 <body>
 <div>
-      
+      <table id='dg'></table>
 </div>
 </body>
+<environment include="Development">
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/easyui/jquery.easyui.min.js"></script>
+    <script>
+    $(function(){
+        $('#dg').datagrid({
+            url:'',
+            columns:[[
+                {field:'Id',title:'Id',width:'50'},
+                {field:'Name',title:'Name',width:'250'},
+                {field:'HostName',title:'HostName',width:'250'},
+                {field:'Connection',title:'Connection',width:'250'},
+                {field:'CreateTime',title:'CreateTime',width:'100'},
+            ]],
+            toolbar: [{
+                iconCls: 'icon-add',
+                handler: function(){window.location.href='/home/CreateTenantView'}
+            },'-',{
+                iconCls: 'icon-help',
+                handler: function(){alert('help')}
+            }]
+        });
+    })
+</script>
+</environment>
 </html>

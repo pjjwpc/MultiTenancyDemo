@@ -1,55 +1,60 @@
-using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MultiTenancyDemo.Data;
 using CacheManager.Core;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using MultiTenancyDemo.Data;
 
-namespace MultiTenancyDemo.Uow
+namespace MultiTenancyDemo.Uow 
 {
-    public class MultiTenancyDemoUnitOfWork:IMultiTenancyDemoUnitOfWork
+    public class MultiTenancyDemoUnitOfWork : IMultiTenancyDemoUnitOfWork 
     {
         private readonly ICacheManager<Tenant> _cacheManager;
+
+        private readonly MultiTenantType _multiTenantType;
 
         /// <summary>
         /// 当前活动的DbContext
         /// </summary>
-        public IDictionary<string,DbContext> ActiveDbContext;
+        public IDictionary<string, DbContext> ActiveDbContext;
 
-        private readonly IServiceCollection _serviceCollection;
-        
+        private readonly IServiceProvider _serviceProvoider;
+
         //private readonly 
 
-        public MultiTenancyDemoUnitOfWork(ICacheManager<Tenant> cacheManager,IServiceCollection service)
+        public MultiTenancyDemoUnitOfWork(ICacheManager<Tenant> cacheManager,IServiceProvider serviceProvider,MultiTenantType multiTenantType) 
         {
             this._cacheManager = cacheManager;
-            this._serviceCollection=service;
-            ActiveDbContext=new Dictionary<string,DbContext>();
+            this._serviceProvoider = serviceProvider;
+            this._multiTenantType=multiTenantType;
+            ActiveDbContext = new Dictionary<string, DbContext> ();
         }
-
-        public int? TenantId{get;set;}
+        
+        public Tenant Tenant { get; set; }
 
         /// <summary>
         /// 设置租户ID
         /// </summary>
         /// <param name="tenantId"></param>
-        public void SetTenanId(int? tenantId)
+        public void SetTenantInfo (Tenant tenant) 
         {
-            TenantId=tenantId;
+            Tenant = tenant;
         }
 
-        public int? GetTenanId()
+        public Tenant GetTenantInfo () 
         {
-            return TenantId;
+            return Tenant;
         }
 
         /// <summary>
         /// 保存当次变更-同步
         /// </summary>
-        public void SaveChanges()
+        public void SaveChanges ()
         {
-            foreach(var dbContext in ActiveDbContext.Values)
+            foreach (var dbContext in ActiveDbContext.Values) 
             {
+               
                 dbContext.SaveChanges();
             }
         }
@@ -58,11 +63,11 @@ namespace MultiTenancyDemo.Uow
         /// 保存当次变更-异步
         /// </summary>
         /// <returns></returns>
-        public async Task SaveChangesAsync()
+        public async Task SaveChangesAsync () 
         {
-            foreach(var dbContext in ActiveDbContext.Values)
+            foreach (var dbContext in ActiveDbContext.Values) 
             {
-                await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync ();
             }
         }
         /// <summary>
@@ -70,27 +75,29 @@ namespace MultiTenancyDemo.Uow
         /// </summary>
         /// <typeparam name="TDbContext"></typeparam>
         /// <returns></returns>
-        public TDbContext GetDbContext<TDbContext>(MultiTenantType? multiTenantType)
-                where TDbContext:DbContext
+        public TDbContext GetDbContext<TDbContext> (MultiTenantType? multiTenantType)
+            where TDbContext : DbContext 
         {
             DbContext dbContext;
-            if(multiTenantType.HasValue&&multiTenantType.Value== MultiTenantType.Tenant
-                && TenantId.HasValue&&TenantId>0)
+            if (multiTenantType.HasValue &&
+                multiTenantType.Value == MultiTenantType.Tenant &&
+                Tenant!=null &&
+                Tenant.Id > 0) {
+                Tenant tenant = _cacheManager.Get (Tenant.Id.ToString ());
+                var dbOptionBuilder = new DbContextOptionsBuilder<TDbContext> ();
+                var dbOptions = dbOptionBuilder.UseMySql (tenant.Connection);
+                dbContext = new DbContext (dbOptions.Options);
+                ActiveDbContext[tenant.Connection] = dbContext;
+            } 
+            else 
             {
-              Tenant tenant=  _cacheManager.Get(TenantId.ToString());
-              var dbOptionBuilder=new DbContextOptionsBuilder<TDbContext>();
-              var dbOptions= dbOptionBuilder.UseMySql(tenant.Connection);
-               dbContext=  new DbContext(dbOptions.Options);
-               ActiveDbContext[tenant.Connection]=dbContext;
+                //当前应用程序类型不是多租户，或者当前用户是普通用户
+                //从容器中拿数据库上下文，不需要创建
+                dbContext = _serviceProvoider.GetService<TDbContext>();
+                string connetcionString = dbContext.Database.GetDbConnection ().ConnectionString;
+                ActiveDbContext[connetcionString] = dbContext;
             }
-              
-            
-            else
-            {
-               dbContext= _serviceCollection.BuildServiceProvider().GetService<DbContext>();
-              // ActiveDbContext[]
-            }
-            return (TDbContext)dbContext;
+            return (TDbContext) dbContext;
         }
     }
 }

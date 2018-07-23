@@ -1,0 +1,24 @@
+@model MultiTenancyDemo.Data.Tenant
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>添加租户</title>
+</head>
+<body>
+<div>
+    <label asp-for="@Model.Name"></label>
+    <input asp-for="@Model.Name"></input>
+    <br/>
+    <label asp-for="@Model.HostName"></label>
+    <input asp-for="@Model.HostName"></input>
+    <br/>
+    <label asp-for="@Model.Connection"></label>
+    <input asp-for="@Model.Connection"></input>
+    <br/>
+    <label asp-for="@Model.TenantDbType"></label>
+    <input asp-for="@Model.TenantDbType"></input>
+</div>
+</body>
+</html>

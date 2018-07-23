@@ -7,6 +7,8 @@ namespace MultiTenancyDemo.Data
         public int Id { get; set; }
         
         public string Name { get; set; }
+
+        public string HostName{get;set;}
         
         public TenantType TenantType { get; set; }
         

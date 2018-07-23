@@ -1,15 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc;
+using MultiTenancyDemo.Data;
+using MultiTenancyDemo.Models;
+using MultiTenancyDemo.Repository;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using MultiTenancyDemo.Models;
 
 namespace MultiTenancyDemo.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IMultiTenantRepositoryBase<Tenant> _tenantRepository;
+        public HomeController(IMultiTenantRepositoryBase<Tenant> tenantRepository)
+        {
+            _tenantRepository=tenantRepository;
+        }
+
+        #region 租户相关
+
+        public IActionResult Tenant()
+        {
+            return View("ManagerTenancy");
+        }
+        public IActionResult GetTenant()
+        {
+            var result=_tenantRepository.GetAll().ToList();
+
+            return Json(new PageModel<Tenant>(){Total=result.Count,Rows=result});
+        }
+
+        public IActionResult CreateTenantView()
+        {
+            return View("CreateTenant");
+        }
+        public IActionResult CreateTenant(Tenant tenant)
+        {
+            _tenantRepository.Create(tenant);
+            return Ok();
+        }
+
+        #endregion
+        
+
         public IActionResult Index()
         {
             return View();

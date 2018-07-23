@@ -4,4 +4,9 @@ namespace MultiTenancyDemo.Data
     {
         int TenantId{get;set;}
     }
+
+    public interface IMayHaveTenant
+    {
+        int? TenantId{get;set;}
+    }
 }

@@ -1,13 +1,13 @@
 ﻿{
   "version": "1.0.0",
   "restore": {
-    "projectUniqueName": "/home/wangpc/WorkSpace/31Huiyi/MultiTenancyDemo/test/MultiTenancyDemo.UnitTests/MultiTenancyDemo.UnitTests.csproj",
+    "projectUniqueName": "/Users/wangpc/WorkSpace/31Huiyi/MultiTenancyDemo/test/MultiTenancyDemo.UnitTests/MultiTenancyDemo.UnitTests.csproj",
     "projectName": "MultiTenancyDemo.UnitTests",
-    "projectPath": "/home/wangpc/WorkSpace/31Huiyi/MultiTenancyDemo/test/MultiTenancyDemo.UnitTests/MultiTenancyDemo.UnitTests.csproj",
-    "outputPath": "/home/wangpc/WorkSpace/31Huiyi/MultiTenancyDemo/test/MultiTenancyDemo.UnitTests/obj/",
+    "projectPath": "/Users/wangpc/WorkSpace/31Huiyi/MultiTenancyDemo/test/MultiTenancyDemo.UnitTests/MultiTenancyDemo.UnitTests.csproj",
+    "outputPath": "/Users/wangpc/WorkSpace/31Huiyi/MultiTenancyDemo/test/MultiTenancyDemo.UnitTests/obj/",
     "projectStyle": "PackageReference",
     "fallbackFolders": [
-      "/usr/share/dotnet/sdk/NuGetFallbackFolder"
+      "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
     ],
     "originalTargetFrameworks": [
       "netcoreapp2.1"

@@ -1,4 +1,6 @@
 using MultiTenancyDemo.Data;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MultiTenancyDemo.Repository
 {
@@ -9,6 +11,5 @@ namespace MultiTenancyDemo.Repository
 
     public interface IMultiTenantRepositoryBase<TEntity,TKey>:IRepository<MultiTenancyDbContext,TEntity,TKey>
     {
-         
     }
 }

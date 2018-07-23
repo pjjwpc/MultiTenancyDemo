@@ -1,0 +1,72 @@
+﻿@model MultiTenancyDemo.Data.Tenant
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Tenant</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.HostName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.HostName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TenantType)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TenantType)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Connection)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Connection)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TenantDbType)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TenantDbType)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.IsActive)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsActive)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.IsDeleted)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsDeleted)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CreateTime)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CreateTime)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DeleteTime)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DeleteTime)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
