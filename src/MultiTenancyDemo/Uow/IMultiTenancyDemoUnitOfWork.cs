@@ -14,6 +14,6 @@ namespace MultiTenancyDemo.Uow
 
         Task SaveChangesAsync();
 
-        TDbContext GetDbContext<TDbContext>(MultiTenantType? multiTenantType) where TDbContext : DbContext;
+        TDbContext GetDbContext<TDbContext>() where TDbContext : DbContext;
     }
 }

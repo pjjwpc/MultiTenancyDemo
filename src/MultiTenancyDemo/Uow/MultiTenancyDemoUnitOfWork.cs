@@ -36,7 +36,12 @@ namespace MultiTenancyDemo.Uow
             return Tenant;
         }
         
-        public Tenant Tenant { get; set; }
+        public MultiTenancyDemoUnitOfWork(Tenant tenant) 
+        {
+            this.Tenant = tenant;
+               
+        }
+                public Tenant Tenant { get; set; }
 
         /// <summary>
         /// 设置租户ID
@@ -80,26 +85,25 @@ namespace MultiTenancyDemo.Uow
         /// </summary>
         /// <typeparam name="TDbContext"></typeparam>
         /// <returns></returns>
-        public TDbContext GetDbContext<TDbContext> (MultiTenantType? multiTenantType)
-            where TDbContext : DbContext 
+        public TDbContext GetDbContext<TDbContext> ()
+            where TDbContext : DbContext
         {
             DbContext dbContext;
-            if (multiTenantType.HasValue &&
-                multiTenantType.Value == MultiTenantType.Tenant &&
-                Tenant!=null &&
-                Tenant.Id > 0) {
-                Tenant tenant = _cacheManager.Get (Tenant.Id.ToString ());
-                var dbOptionBuilder = new DbContextOptionsBuilder<TDbContext> ();
-                var dbOptions = dbOptionBuilder.UseMySql (tenant.Connection);
-                dbContext = new DbContext (dbOptions.Options);
-                ActiveDbContext[tenant.Connection] = dbContext;
+            if (Tenant!=null &&
+                Tenant.Id > 0) 
+            {
+                var dbOptionBuilder = new DbContextOptionsBuilder<TDbContext>();
+                dbOptionBuilder.UseMySql(Tenant.Connection);
+                Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(dbOptionBuilder));
+                dbContext = new TDbContext(dbOptionBuilder.Options);
+                ActiveDbContext[Tenant.Connection] = dbContext;
             } 
             else 
             {
                 //当前应用程序类型不是多租户，或者当前用户是普通用户
                 //从容器中拿数据库上下文，不需要创建
                 dbContext = _serviceProvoider.GetService<TDbContext>();
-                string connetcionString = dbContext.Database.GetDbConnection ().ConnectionString;
+                string connetcionString = dbContext.Database.GetDbConnection().ConnectionString;
                 ActiveDbContext[connetcionString] = dbContext;
             }
             

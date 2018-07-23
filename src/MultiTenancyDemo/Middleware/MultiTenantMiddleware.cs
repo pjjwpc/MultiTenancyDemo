@@ -32,6 +32,8 @@ namespace MultiTenancyDemo.Middleware
             string path=context.Request.Path;
             string url = context.Request.GetDisplayUrl();
             url=url.Remove(url.IndexOf(path));
+            
+            _logger.LogError(url);
             Tenant tenant;
             if(TenantIdDic.TryGetValue(url,out tenant))
             {
