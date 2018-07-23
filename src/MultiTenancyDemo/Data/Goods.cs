@@ -1,8 +1,9 @@
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MultiTenancyDemo.Data
 {
-    public class Goods : IMustHaveTenant
+    public class Goods : IMustHaveTenant,IHasCreateTime,IHasUpdateTime
     {
         public int Id{get;set;}
 
@@ -22,5 +23,7 @@ namespace MultiTenancyDemo.Data
         public Tenant Tenant{get;set;}
 
         public GoodsStatus Status{get;set;}
+        public DateTime CreateTime { get ;set; }
+        public DateTime UpdateTime { get ;set; }
     }
 }

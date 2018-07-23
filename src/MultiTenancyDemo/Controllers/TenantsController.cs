@@ -4,16 +4,20 @@ using MultiTenancyDemo.Data;
 using MultiTenancyDemo.Repository;
 using System.Linq;
 using System.Threading.Tasks;
+using MultiTenancyDemo.Uow;
 
 namespace MultiTenancyDemo.Controllers
 {
     public class TenantsController : Controller
     {
         private readonly IMultiTenantRepositoryBase<Tenant> _repository;
+        private readonly IMultiTenancyDemoUnitOfWork _unitOfWork;
 
-        public TenantsController(IMultiTenantRepositoryBase<Tenant> repository)
+        public TenantsController(IMultiTenantRepositoryBase<Tenant> repository,
+                                IMultiTenancyDemoUnitOfWork unitOfWork)
         {
             _repository = repository;
+            this._unitOfWork=unitOfWork;
         }
 
         // GET: Tenants
@@ -43,6 +47,7 @@ namespace MultiTenancyDemo.Controllers
         // GET: Tenants/Create
         public IActionResult Create()
         {
+
             return View();
         }
 
@@ -56,7 +61,7 @@ namespace MultiTenancyDemo.Controllers
             if (ModelState.IsValid)
             {
                 await _repository.CreateAsync(tenant);
-                //await _context.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(tenant);
@@ -95,7 +100,7 @@ namespace MultiTenancyDemo.Controllers
                 try
                 {
                    await _repository.UpdateAsync(tenant);
-                    //await _context.SaveChangesAsync();
+                    await _unitOfWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {

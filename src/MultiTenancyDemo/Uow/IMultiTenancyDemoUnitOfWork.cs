@@ -6,8 +6,10 @@ namespace MultiTenancyDemo.Uow
 {
     public interface IMultiTenancyDemoUnitOfWork
     {
+        Tenant GetTenant();
 
-       void SetTenantInfo(Tenant tenant);
+        void SetTenantInfo(Tenant tenant);
+
         void SaveChanges();
 
         Task SaveChangesAsync();

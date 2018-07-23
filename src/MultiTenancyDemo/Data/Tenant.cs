@@ -2,7 +2,7 @@
 
 namespace MultiTenancyDemo.Data
 {
-    public class Tenant
+    public class Tenant:ISoftDelete,IHasCreateTime,IHasUpdateTime
     {
         public int Id { get; set; }
         
@@ -24,5 +24,6 @@ namespace MultiTenancyDemo.Data
 
         public DateTime DeleteTime{get;set;}
         
+        public DateTime UpdateTime { get ;set; }
     }
 }

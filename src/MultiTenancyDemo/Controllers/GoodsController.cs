@@ -7,16 +7,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MultiTenancyDemo.Data;
 using MultiTenancyDemo.Repository;
+using MultiTenancyDemo.Uow;
 
 namespace MultiTenancyDemo.Controllers
 {
     public class GoodsController : Controller
     {
         private readonly IMultiTenantRepositoryBase<Goods> _repository;
+        private readonly IMultiTenancyDemoUnitOfWork _unitOfWork;
 
-        public GoodsController(IMultiTenantRepositoryBase<Goods> repository)
+        public GoodsController(IMultiTenantRepositoryBase<Goods> repository
+                              ,IMultiTenancyDemoUnitOfWork unitOfWork)
         {
             _repository = repository;
+            _unitOfWork=unitOfWork;
         }
 
         // GET: Goods
@@ -63,7 +67,9 @@ namespace MultiTenancyDemo.Controllers
         {
             if (ModelState.IsValid)
             {
+                goods.UserId=1;
                await _repository.CreateAsync(goods);
+               await _unitOfWork.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             //ViewData["TenantId"] = new SelectList(_context.Tenant, "Id", "Id", goods.TenantId);

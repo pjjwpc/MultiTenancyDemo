@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using CacheManager.Core;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,8 @@ using MultiTenancyDemo.Data;
 using MultiTenancyDemo.Middleware;
 using MultiTenancyDemo.Repository;
 using MultiTenancyDemo.Uow;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MultiTenancyDemo
 {
@@ -47,7 +50,9 @@ namespace MultiTenancyDemo
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env
+                    ,IMultiTenantRepositoryBase<Tenant> tenantRepositoy
+                    ,ICacheManager<Tenant> cacheManager)
         {
             if (env.IsDevelopment())
             {
@@ -70,6 +75,10 @@ namespace MultiTenancyDemo
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+           foreach(var temp in tenantRepositoy.GetAll().ToList())
+           {
+               cacheManager.Add(temp.HostName,temp);
+           }
         }
     }
 }

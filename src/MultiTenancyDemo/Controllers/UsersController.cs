@@ -4,16 +4,20 @@ using MultiTenancyDemo.Data;
 using MultiTenancyDemo.Repository;
 using System.Linq;
 using System.Threading.Tasks;
+using MultiTenancyDemo.Uow;
 
 namespace MultiTenancyDemo.Controllers
 {
     public class UsersController : Controller
     {
         private readonly IMultiTenantRepositoryBase<User> _repository;
+        private readonly IMultiTenancyDemoUnitOfWork _unitOfWork;
 
-        public UsersController(IMultiTenantRepositoryBase<User> repository)
+        public UsersController(IMultiTenantRepositoryBase<User> repository,
+                              IMultiTenancyDemoUnitOfWork unitOfWork)
         {
             _repository = repository;
+            this._unitOfWork=unitOfWork;
         }
 
         // GET: Users
@@ -58,7 +62,7 @@ namespace MultiTenancyDemo.Controllers
             if (ModelState.IsValid)
             {
                 _repository.Create(user);
-               
+                await _unitOfWork.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             //ViewData["TenantId"] = new SelectList(_context.Tenant, "Id", "Id", user.TenantId);

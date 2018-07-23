@@ -2,7 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using MultiTenancyDemo.Extensions;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using MultiTenancyDemo.Data;
+using MultiTenancyDemo.Uow;
 
 namespace MultiTenancyDemo.Data
 {
@@ -12,11 +15,7 @@ namespace MultiTenancyDemo.Data
     /// </summary>
     public class MultiTenancyDbContext:DbContext
     {
-        private Tenant _tenant;
-        internal void SetTenant(Tenant tenant)
-        {
-            _tenant=tenant;
-        }
+        private readonly IMultiTenancyDemoUnitOfWork _unitOfWork;
         public DbSet<User> User{get;set;}
 
         public DbSet<Goods> Goods{get;set;}
@@ -25,15 +24,23 @@ namespace MultiTenancyDemo.Data
         
         public DbSet<Tenant> Tenant { get; set; }
         
-        public MultiTenancyDbContext(DbContextOptions<MultiTenancyDbContext> options):base(options)
+        public MultiTenancyDbContext(DbContextOptions<MultiTenancyDbContext> options,IMultiTenancyDemoUnitOfWork unitOfWork):base(options)
         {
-
+            this._unitOfWork = unitOfWork;
         }
 
         public override int SaveChanges()
         {
             AppMultiTenant();
+            
             return base.SaveChanges();
+        }
+
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            AppMultiTenant();
+            return await base.SaveChangesAsync(cancellationToken);
         }
 
 
@@ -53,7 +60,7 @@ namespace MultiTenancyDemo.Data
                     ApplyConceptsForAddedEntity(entry, userId);
                     break;
                 case EntityState.Modified:
-                    //ApplyAbpConceptsForModifiedEntity(entry, userId);
+                    ApplyAbpConceptsForModifiedEntity(entry, userId);
                     break;
                 case EntityState.Deleted:
                     //ApplyAbpConceptsForDeletedEntity(entry, userId);
@@ -67,8 +74,42 @@ namespace MultiTenancyDemo.Data
         {
             CheckAndSetMustHaveTenantIdProperty(entry.Entity);
             CheckAndSetMayHaveTenantIdProperty(entry.Entity);
+            CheckAndBaseProperty(entry.Entity);
         }
 
+         protected virtual void ApplyAbpConceptsForModifiedEntity(EntityEntry entry, long? userId)
+        {
+            CheckAndSetMustHaveTenantIdProperty(entry.Entity);
+            CheckAndSetMayHaveTenantIdProperty(entry.Entity);
+            CheckAndUpdateBaseProperty(entry.Entity);
+        }
+        public virtual void CheckAndBaseProperty(object entity)
+        {
+            if(!(entity is IHasCreateTime))
+            {
+                return;
+            }
+            else
+            {
+                var entityWithCreateTime=entity as IHasCreateTime;
+                entityWithCreateTime.CreateTime=DateTime.Now;
+            }
+            
+        }
+
+        public virtual void CheckAndUpdateBaseProperty(object entity)
+        {
+            if(!(entity is IHasUpdateTime))
+            {
+                return;
+            }
+            else
+            {
+                var entityWithCreateTime=entity as IHasUpdateTime;
+                entityWithCreateTime.UpdateTime=DateTime.Now;
+            }
+            
+        }
         protected virtual void CheckAndSetMustHaveTenantIdProperty(object entityAsObj)
         {
 
@@ -86,6 +127,8 @@ namespace MultiTenancyDemo.Data
                 return;
             }
 
+            Tenant _tenant = _unitOfWork.GetTenant();
+                 
 
             if (_tenant != null)
             {
@@ -109,6 +152,7 @@ namespace MultiTenancyDemo.Data
 
             var entity = entityAsObj as IMayHaveTenant;
 
+            Tenant _tenant = _unitOfWork.GetTenant();
             //Don't set if it's already set
             if (entity.TenantId != null)
             {

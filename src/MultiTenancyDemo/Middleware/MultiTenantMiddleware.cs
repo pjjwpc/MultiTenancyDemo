@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Primitives;
 using MultiTenancyDemo.Data;
+using Newtonsoft.Json;
 
 namespace MultiTenancyDemo.Middleware
 {
@@ -28,14 +29,17 @@ namespace MultiTenancyDemo.Middleware
         public async Task Invoke(HttpContext context,IMultiTenancyDemoUnitOfWork multiTenancyDemoUnitOfWork
                                 ,CacheManager.Core.ICacheManager<Tenant> cacheManager)
         {
+            string path=context.Request.Path;
             string url = context.Request.GetDisplayUrl();
-            if(TenantIdDic.TryGetValue(url,out Tenant tenantId))
+            url=url.Remove(url.IndexOf(path));
+            Tenant tenant;
+            if(TenantIdDic.TryGetValue(url,out tenant))
             {
-                multiTenancyDemoUnitOfWork.SetTenantInfo(tenantId);
+                multiTenancyDemoUnitOfWork.SetTenantInfo(tenant);
             }
             else
             {
-               Tenant tenant=cacheManager.Get(url);
+             tenant=cacheManager.Get(url);
                if(tenant==null)
                {
                    TenantIdDic.TryAdd(url,defaultTenant);
@@ -46,10 +50,9 @@ namespace MultiTenancyDemo.Middleware
                    TenantIdDic.TryAdd(url,tenant);
                }
             }
-            
             _logger.LogError("开始识别租户");
             await _next.Invoke(context);
-            _logger.LogError($"识别出租户信息\n Path:{url}");
+            _logger.LogError($"识别出租户信息\n TenantInfo:{JsonConvert.SerializeObject(tenant)}");
         }
     }
 }

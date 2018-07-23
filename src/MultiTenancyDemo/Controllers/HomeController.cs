@@ -15,32 +15,6 @@ namespace MultiTenancyDemo.Controllers
             _tenantRepository=tenantRepository;
         }
 
-        #region 租户相关
-
-        public IActionResult Tenant()
-        {
-            return View("ManagerTenancy");
-        }
-        public IActionResult GetTenant()
-        {
-            var result=_tenantRepository.GetAll().ToList();
-
-            return Json(new PageModel<Tenant>(){Total=result.Count,Rows=result});
-        }
-
-        public IActionResult CreateTenantView()
-        {
-            return View("CreateTenant");
-        }
-        public IActionResult CreateTenant(Tenant tenant)
-        {
-            _tenantRepository.Create(tenant);
-            return Ok();
-        }
-
-        #endregion
-        
-
         public IActionResult Index()
         {
             return View();

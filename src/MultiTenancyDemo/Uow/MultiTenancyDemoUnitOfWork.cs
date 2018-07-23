@@ -30,6 +30,11 @@ namespace MultiTenancyDemo.Uow
             this._multiTenantType=multiTenantType;
             ActiveDbContext = new Dictionary<string, DbContext> ();
         }
+
+        public Tenant GetTenant()
+        {
+            return Tenant;
+        }
         
         public Tenant Tenant { get; set; }
 
@@ -97,6 +102,7 @@ namespace MultiTenancyDemo.Uow
                 string connetcionString = dbContext.Database.GetDbConnection ().ConnectionString;
                 ActiveDbContext[connetcionString] = dbContext;
             }
+            
             return (TDbContext) dbContext;
         }
     }
