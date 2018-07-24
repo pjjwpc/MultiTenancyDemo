@@ -40,6 +40,7 @@ namespace MultiTenancyDemo
             {
                 options.UseMySql("server=localhost;uid=root;pwd=qwe123,.,.;database=MultiTenancy;SslMode=none");
             });
+            
             services.AddSingleton(typeof(MultiTenantType),MultiTenantType.Tenant);
             services.AddScoped(typeof(IDbContextProvider<>),typeof(DbContextProvider<>));
             services.AddScoped(typeof(IRepository<,,>),typeof(Repository<,,>));

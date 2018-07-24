@@ -26,7 +26,7 @@ namespace MultiTenancyDemo.Controllers
         // GET: Goods
         public async Task<IActionResult> Index()
         {
-            var multiTenancyDbContext = _repository.GetAll().Include(g => g.Tenant).Include(g => g.User);
+            var multiTenancyDbContext = _repository.GetAll().Include(g => g.User);
             return View(await multiTenancyDbContext.ToListAsync());
         }
 
@@ -39,7 +39,7 @@ namespace MultiTenancyDemo.Controllers
             }
 
             var goods = await _repository.GetAll()
-                .Include(g => g.Tenant)
+               
                 .Include(g => g.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (goods == null)
@@ -140,7 +140,7 @@ namespace MultiTenancyDemo.Controllers
             }
 
             var goods = await _repository.GetAll()
-                .Include(g => g.Tenant)
+                
                 .Include(g => g.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (goods == null)

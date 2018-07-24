@@ -67,8 +67,6 @@ namespace MultiTenancyDemo.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TenantId");
-
                     b.HasIndex("UserId");
 
                     b.ToTable("Orders");
@@ -127,18 +125,11 @@ namespace MultiTenancyDemo.Migrations
 
                     b.HasIndex("Name");
 
-                    b.HasIndex("TenantId");
-
                     b.ToTable("User");
                 });
 
             modelBuilder.Entity("MultiTenancyDemo.Data.Goods", b =>
                 {
-                    b.HasOne("MultiTenancyDemo.Data.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("MultiTenancyDemo.Data.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -147,22 +138,9 @@ namespace MultiTenancyDemo.Migrations
 
             modelBuilder.Entity("MultiTenancyDemo.Data.Order", b =>
                 {
-                    b.HasOne("MultiTenancyDemo.Data.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("MultiTenancyDemo.Data.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("MultiTenancyDemo.Data.User", b =>
-                {
-                    b.HasOne("MultiTenancyDemo.Data.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

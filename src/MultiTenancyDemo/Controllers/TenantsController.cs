@@ -5,6 +5,7 @@ using MultiTenancyDemo.Repository;
 using System.Linq;
 using System.Threading.Tasks;
 using MultiTenancyDemo.Uow;
+using StackExchange.Redis;
 
 namespace MultiTenancyDemo.Controllers
 {
@@ -47,7 +48,6 @@ namespace MultiTenancyDemo.Controllers
         // GET: Tenants/Create
         public IActionResult Create()
         {
-
             return View();
         }
 
@@ -60,8 +60,21 @@ namespace MultiTenancyDemo.Controllers
         {
             if (ModelState.IsValid)
             {
+                
                 await _repository.CreateAsync(tenant);
                 await _unitOfWork.SaveChangesAsync();
+                if(tenant.TenantType== TenantType.有钱租户)
+                {
+                    System.Console.WriteLine("开始创建数据库");
+                    using (ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("127.0.0.1:6379"))
+                    {
+                        System.Console.WriteLine("发布消息");
+                        ISubscriber sub = redis.GetSubscriber();
+                        sub.Publish("createtenant", tenant.Connection);
+                        System.Console.WriteLine("消息发布成功");
+                    }
+                }
+                
                 return RedirectToAction(nameof(Index));
             }
             return View(tenant);

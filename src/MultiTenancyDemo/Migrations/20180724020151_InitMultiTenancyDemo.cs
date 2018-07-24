@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace MultiTenancyDemo.Migrations
 {
-    public partial class InitMultiTenantDemo : Migration
+    public partial class InitMultiTenancyDemo : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -15,13 +15,15 @@ namespace MultiTenancyDemo.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(maxLength: 200, nullable: true),
+                    HostName = table.Column<string>(nullable: true),
                     TenantType = table.Column<int>(nullable: false),
                     Connection = table.Column<string>(maxLength: 200, nullable: true),
                     TenantDbType = table.Column<int>(nullable: false),
                     IsActive = table.Column<bool>(nullable: false),
                     IsDeleted = table.Column<bool>(nullable: false),
                     CreateTime = table.Column<DateTime>(nullable: false),
-                    DeleteTime = table.Column<DateTime>(nullable: false)
+                    DeleteTime = table.Column<DateTime>(nullable: false),
+                    UpdateTime = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -36,17 +38,13 @@ namespace MultiTenancyDemo.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: true),
                     Status = table.Column<int>(nullable: false),
-                    TenantId = table.Column<int>(nullable: false)
+                    TenantId = table.Column<int>(nullable: false),
+                    CreateTime = table.Column<DateTime>(nullable: false),
+                    UpdateTime = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_User", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_User_Tenants_TenantId",
-                        column: x => x.TenantId,
-                        principalTable: "Tenants",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -60,17 +58,13 @@ namespace MultiTenancyDemo.Migrations
                     Image = table.Column<string>(nullable: true),
                     UserId = table.Column<int>(nullable: false),
                     TenantId = table.Column<int>(nullable: false),
-                    Status = table.Column<int>(nullable: false)
+                    Status = table.Column<int>(nullable: false),
+                    CreateTime = table.Column<DateTime>(nullable: false),
+                    UpdateTime = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Goods", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Goods_Tenants_TenantId",
-                        column: x => x.TenantId,
-                        principalTable: "Tenants",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Goods_User_UserId",
                         column: x => x.UserId,
@@ -87,17 +81,13 @@ namespace MultiTenancyDemo.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<int>(nullable: false),
                     TenantId = table.Column<int>(nullable: false),
-                    OrderDes = table.Column<string>(nullable: true)
+                    OrderDes = table.Column<string>(nullable: true),
+                    CreateTime = table.Column<DateTime>(nullable: false),
+                    UpdateTime = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Orders", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Orders_Tenants_TenantId",
-                        column: x => x.TenantId,
-                        principalTable: "Tenants",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Orders_User_UserId",
                         column: x => x.UserId,
@@ -122,11 +112,6 @@ namespace MultiTenancyDemo.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_TenantId",
-                table: "Orders",
-                column: "TenantId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Orders_UserId",
                 table: "Orders",
                 column: "UserId");
@@ -140,11 +125,6 @@ namespace MultiTenancyDemo.Migrations
                 name: "IX_User_Name",
                 table: "User",
                 column: "Name");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_User_TenantId",
-                table: "User",
-                column: "TenantId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -156,10 +136,10 @@ namespace MultiTenancyDemo.Migrations
                 name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "User");
+                name: "Tenants");
 
             migrationBuilder.DropTable(
-                name: "Tenants");
+                name: "User");
         }
     }
 }

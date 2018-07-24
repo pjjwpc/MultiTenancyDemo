@@ -12,8 +12,6 @@ namespace MultiTenancyDemo.Data
         public virtual User User{get;set;}
         public int TenantId{get;set;}
 
-        [ForeignKey("TenantId")]
-        public Tenant Tenant{get;set;}
         public string OrderDes{get;set;}
         public DateTime CreateTime { get ;set; }
         public DateTime UpdateTime { get ;set; }

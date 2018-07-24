@@ -9,8 +9,8 @@ using MultiTenancyDemo.Data;
 namespace MultiTenancyDemo.Migrations
 {
     [DbContext(typeof(MultiTenancyDbContext))]
-    [Migration("20180720021327_InitMultiTenantDemo")]
-    partial class InitMultiTenantDemo
+    [Migration("20180724020151_InitMultiTenancyDemo")]
+    partial class InitMultiTenancyDemo
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,6 +24,8 @@ namespace MultiTenancyDemo.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<DateTime>("CreateTime");
+
                     b.Property<string>("Image");
 
                     b.Property<string>("Name")
@@ -34,6 +36,8 @@ namespace MultiTenancyDemo.Migrations
                     b.Property<int>("Status");
 
                     b.Property<int>("TenantId");
+
+                    b.Property<DateTime>("UpdateTime");
 
                     b.Property<int>("UserId");
 
@@ -53,15 +57,17 @@ namespace MultiTenancyDemo.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<DateTime>("CreateTime");
+
                     b.Property<string>("OrderDes");
 
                     b.Property<int>("TenantId");
 
+                    b.Property<DateTime>("UpdateTime");
+
                     b.Property<int>("UserId");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.HasIndex("UserId");
 
@@ -80,6 +86,8 @@ namespace MultiTenancyDemo.Migrations
 
                     b.Property<DateTime>("DeleteTime");
 
+                    b.Property<string>("HostName");
+
                     b.Property<bool>("IsActive");
 
                     b.Property<bool>("IsDeleted");
@@ -90,6 +98,8 @@ namespace MultiTenancyDemo.Migrations
                     b.Property<int>("TenantDbType");
 
                     b.Property<int>("TenantType");
+
+                    b.Property<DateTime>("UpdateTime");
 
                     b.HasKey("Id");
 
@@ -103,28 +113,25 @@ namespace MultiTenancyDemo.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<DateTime>("CreateTime");
+
                     b.Property<string>("Name");
 
                     b.Property<int>("Status");
 
                     b.Property<int>("TenantId");
 
+                    b.Property<DateTime>("UpdateTime");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Name");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("User");
                 });
 
             modelBuilder.Entity("MultiTenancyDemo.Data.Goods", b =>
                 {
-                    b.HasOne("MultiTenancyDemo.Data.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("MultiTenancyDemo.Data.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -133,22 +140,9 @@ namespace MultiTenancyDemo.Migrations
 
             modelBuilder.Entity("MultiTenancyDemo.Data.Order", b =>
                 {
-                    b.HasOne("MultiTenancyDemo.Data.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("MultiTenancyDemo.Data.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("MultiTenancyDemo.Data.User", b =>
-                {
-                    b.HasOne("MultiTenancyDemo.Data.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

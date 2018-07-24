@@ -41,7 +41,7 @@ namespace MultiTenancyDemo.Uow
             this.Tenant = tenant;
                
         }
-                public Tenant Tenant { get; set; }
+        public Tenant Tenant { get; set; }
 
         /// <summary>
         /// 设置租户ID
@@ -89,13 +89,15 @@ namespace MultiTenancyDemo.Uow
             where TDbContext : DbContext
         {
             DbContext dbContext;
-            if (Tenant!=null &&
-                Tenant.Id > 0) 
+            if (Tenant!=null 
+                && Tenant.TenantType== TenantType.有钱租户
+                && Tenant.Id > 0) 
             {
-                var dbOptionBuilder = new DbContextOptionsBuilder<TDbContext>();
-                dbOptionBuilder.UseMySql(Tenant.Connection);
-                Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(dbOptionBuilder));
-                dbContext = new TDbContext(dbOptionBuilder.Options);
+                //暂时没有好的方法来通过容器改变参数的值，
+                //就先用拿出DbContext赋值的方式变更数据库
+                dbContext = _serviceProvoider.GetService<TDbContext>();
+                dbContext.Database.GetDbConnection().ConnectionString=Tenant.Connection;
+                
                 ActiveDbContext[Tenant.Connection] = dbContext;
             } 
             else 

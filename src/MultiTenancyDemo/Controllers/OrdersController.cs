@@ -26,7 +26,7 @@ namespace MultiTenancyDemo.Controllers
         // GET: Orders
         public async Task<IActionResult> Index()
         {
-            var multiTenancyDbContext = _repository.GetAll().Include(o => o.Tenant).Include(o => o.User);
+            var multiTenancyDbContext = _repository.GetAll().Include(o => o.User);
             return View(await multiTenancyDbContext.ToListAsync());
         }
 
@@ -39,7 +39,7 @@ namespace MultiTenancyDemo.Controllers
             }
 
             var order = await _repository.GetAll()
-                .Include(o => o.Tenant)
+                
                 .Include(o => o.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
@@ -138,7 +138,6 @@ namespace MultiTenancyDemo.Controllers
             }
 
             var order = await _repository.GetAll()
-                .Include(o => o.Tenant)
                 .Include(o => o.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)

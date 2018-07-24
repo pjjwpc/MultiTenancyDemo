@@ -19,9 +19,6 @@ namespace MultiTenancyDemo.Data
 
         public int TenantId{get;set;}
 
-        [ForeignKey("TenantId")]
-        public Tenant Tenant{get;set;}
-
         public GoodsStatus Status{get;set;}
         public DateTime CreateTime { get ;set; }
         public DateTime UpdateTime { get ;set; }
