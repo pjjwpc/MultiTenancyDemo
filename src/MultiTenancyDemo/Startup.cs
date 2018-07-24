@@ -1,4 +1,5 @@
-﻿using CacheManager.Core;
+﻿using System;
+using CacheManager.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -11,8 +12,8 @@ using MultiTenancyDemo.Data;
 using MultiTenancyDemo.Middleware;
 using MultiTenancyDemo.Repository;
 using MultiTenancyDemo.Uow;
-using System.Collections.Generic;
 using System.Linq;
+using Com.Ctrip.Framework.Apollo;
 
 namespace MultiTenancyDemo
 {
@@ -35,20 +36,36 @@ namespace MultiTenancyDemo
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            #region Apollo相关
+
+            string connection = Configuration.GetValue<string>("ConnectionString");
+            Console.WriteLine($"connection:{connection}");
+            #endregion
+
+            #region CacheManager
             services.AddCacheManagerConfiguration(Configuration);
-            services.AddScoped<IMultiTenancyDemoUnitOfWork,MultiTenancyDemoUnitOfWork>();
+            services.AddCacheManager();
+            #endregion
+
+            
             services.AddDbContext<MultiTenancyDbContext>(options=>
             {
                 options.UseLoggerFactory(Mlogger);
-                options.UseMySql("server=localhost;uid=root;pwd=qwe123,.,.;database=MultiTenancy;SslMode=none");
+                options.UseMySql(connection);
             });
+
+            #region  多租户相关处理
             services.AddSingleton<ITenantResolverProvider,UrlTenantResolverProvider>();
             services.AddSingleton(typeof(MultiTenantType),MultiTenantType.Tenant);
             services.AddScoped(typeof(IDbContextProvider<>),typeof(DbContextProvider<>));
+            services.AddScoped<IMultiTenancyDemoUnitOfWork,MultiTenancyDemoUnitOfWork>();
+            #endregion
+
+            #region Repository
             services.AddScoped(typeof(IRepository<,,>),typeof(Repository<,,>));
             services.AddScoped(typeof(IMultiTenantRepositoryBase<,>),typeof(MultiTenantRepositoryBase<,>));
             services.AddScoped(typeof(IMultiTenantRepositoryBase<>),typeof(MultiTenantRepositoryBase<>));
-            services.AddCacheManager();
+            #endregion
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
         private static ILoggerFactory Mlogger =>new LoggerFactory()

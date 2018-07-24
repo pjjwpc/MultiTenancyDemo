@@ -27,5 +27,4 @@ namespace MultiTenancyDemo.Data
         Mysql=0,
         SqlServer=1
     }
-
 }

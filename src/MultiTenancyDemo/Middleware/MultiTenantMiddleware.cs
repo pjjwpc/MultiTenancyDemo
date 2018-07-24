@@ -26,14 +26,16 @@ namespace MultiTenancyDemo.Middleware
             _logger = loggerFactory.CreateLogger<MultiTenantMiddleware>();
         }
         
-        public async Task Invoke(HttpContext context,IMultiTenancyDemoUnitOfWork multiTenancyDemoUnitOfWork
-                                ,ICacheManager<Tenant> cacheManager,ITenantResolverProvider tenantResolverProvider)
+        public async Task Invoke(HttpContext context
+                                ,IMultiTenancyDemoUnitOfWork multiTenancyDemoUnitOfWork
+                                ,ICacheManager<Tenant> cacheManager
+                                ,ITenantResolverProvider tenantResolverProvider)
         {
             Tenant tenant=tenantResolverProvider.GetTenant(context);
             tenant=tenant??defaultTenant;
             multiTenancyDemoUnitOfWork.SetTenantInfo(tenant);
             await _next.Invoke(context);
-            _logger.LogError($"识别出租户信息\n TenantInfo:{JsonConvert.SerializeObject(tenant)}");
+            _logger.LogDebug($"识别出租户信息\n 租户ID:{tenant.Id}");
         }
     }
 }
