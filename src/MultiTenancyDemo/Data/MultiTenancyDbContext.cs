@@ -1,3 +1,7 @@
+/*
+    大段代码摘抄自Abp（全局过滤器） 
+    https://github.com/aspnetboilerplate/aspnetboilerplate/blob/dev/src/Abp.EntityFrameworkCore/EntityFrameworkCore/AbpDbContext.cs
+ */
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using MultiTenancyDemo.Extensions;
@@ -34,7 +38,6 @@ namespace MultiTenancyDemo.Data
         {
             get
             {
-                Console.WriteLine($"租户ID{_unitOfWork.GetTenant().Id}");
                 return _unitOfWork.GetTenant().Id;
             }
         }
