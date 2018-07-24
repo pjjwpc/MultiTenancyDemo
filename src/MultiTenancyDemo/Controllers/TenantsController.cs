@@ -113,7 +113,7 @@ namespace MultiTenancyDemo.Controllers
                 try
                 {
                    await _repository.UpdateAsync(tenant);
-                    await _unitOfWork.SaveChangesAsync();
+                   await _unitOfWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {

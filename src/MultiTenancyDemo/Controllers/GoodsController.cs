@@ -26,7 +26,7 @@ namespace MultiTenancyDemo.Controllers
         // GET: Goods
         public async Task<IActionResult> Index()
         {
-            var multiTenancyDbContext = _repository.GetAll().Include(g => g.User);
+            var multiTenancyDbContext = _repository.GetAll();
             return View(await multiTenancyDbContext.ToListAsync());
         }
 

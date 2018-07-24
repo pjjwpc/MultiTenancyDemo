@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using MultiTenancyDemo.Data;
 using MultiTenancyDemo.Middleware;
 using MultiTenancyDemo.Repository;
@@ -38,6 +39,7 @@ namespace MultiTenancyDemo
             services.AddScoped<IMultiTenancyDemoUnitOfWork,MultiTenancyDemoUnitOfWork>();
             services.AddDbContext<MultiTenancyDbContext>(options=>
             {
+                options.UseLoggerFactory(Mlogger);
                 options.UseMySql("server=localhost;uid=root;pwd=qwe123,.,.;database=MultiTenancy;SslMode=none");
             });
             services.AddSingleton<ITenantResolverProvider,UrlTenantResolverProvider>();
@@ -49,6 +51,10 @@ namespace MultiTenancyDemo
             services.AddCacheManager();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
+        private static ILoggerFactory Mlogger =>new LoggerFactory()
+                 .AddDebug((categoryName, logLevel) => (logLevel == LogLevel.Information) && (categoryName == DbLoggerCategory.Database.Command.Name))
+                .AddConsole((categoryName, logLevel) => (logLevel == LogLevel.Information) && (categoryName == DbLoggerCategory.Database.Command.Name));
+        
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env

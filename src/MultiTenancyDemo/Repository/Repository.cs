@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 
 namespace MultiTenancyDemo.Repository
 {
-    public class Repository<TDbContext,TEntity,TKey>:IRepository<TDbContext,TEntity,TKey>
+    public class Repository<TDbContext,TEntity,TKey>:
+        IRepository<TDbContext,TEntity,TKey>
         where TDbContext:DbContext 
         where TEntity : class
     {
@@ -16,13 +17,7 @@ namespace MultiTenancyDemo.Repository
         }
 
         public virtual TDbContext DbContext=>_dbContenxtProvider.GetDbContext();
-        public virtual DbSet<TEntity> Table
-        {
-            get
-            {
-                return DbContext.Set<TEntity>();
-            }
-        }
+        public virtual DbSet<TEntity> Table=> DbContext.Set<TEntity>();
 
         public virtual TDbContext GetDbContext()
         {
@@ -31,7 +26,6 @@ namespace MultiTenancyDemo.Repository
 
         public virtual IQueryable<TEntity> GetAll()
         {
-
             return Table.AsQueryable<TEntity>();
         }
 
