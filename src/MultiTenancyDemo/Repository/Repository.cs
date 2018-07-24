@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -44,6 +45,18 @@ namespace MultiTenancyDemo.Repository
         {
             Table.Attach(entity).State = EntityState.Modified;
             return Task.CompletedTask;
+        }
+
+        public bool Remove(TEntity entity)
+        {
+            Table.Remove(entity);
+            return true;
+        }
+
+        public bool RemoveRange(IList<TEntity> entities)
+        {
+            Table.RemoveRange(entities);
+            return true;
         }
     }
 }

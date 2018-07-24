@@ -38,8 +38,6 @@ namespace MultiTenancyDemo.Data
                 return _unitOfWork.GetTenant().Id;
             }
         }
-        
-
 
         public MultiTenancyDbContext(DbContextOptions<MultiTenancyDbContext> options,IMultiTenancyDemoUnitOfWork unitOfWork):base(options)
         {
@@ -48,28 +46,26 @@ namespace MultiTenancyDemo.Data
 
         public override int SaveChanges()
         {
-            AppMultiTenant();
+            ApplyMultiTenant();
             
             return base.SaveChanges();
         }
 
-
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            AppMultiTenant();
+            ApplyMultiTenant();
             return await base.SaveChangesAsync(cancellationToken);
         }
 
-
-        protected virtual void AppMultiTenant()
+        protected virtual void ApplyMultiTenant()
         {
             foreach(var entry in this.ChangeTracker.Entries())
             {
-                ApplyAbpConcepts(entry,null);
+                ApplyConcepts(entry,null);
             }
         }
 
-        protected virtual void ApplyAbpConcepts(EntityEntry entry, long? userId)
+        protected virtual void ApplyConcepts(EntityEntry entry, long? userId)
         {
             switch (entry.State)
             {
@@ -77,14 +73,12 @@ namespace MultiTenancyDemo.Data
                     ApplyConceptsForAddedEntity(entry, userId);
                     break;
                 case EntityState.Modified:
-                    ApplyAbpConceptsForModifiedEntity(entry, userId);
+                    ApplyConceptsForModifiedEntity(entry, userId);
                     break;
                 case EntityState.Deleted:
-                    //ApplyAbpConceptsForDeletedEntity(entry, userId);
+                    ApplyConceptsForDeletedEntity(entry, userId);
                     break;
             }
-
-            //AddDomainEvents(changeReport.DomainEvents, entry.Entity);
         }
 
         protected virtual void ApplyConceptsForAddedEntity(EntityEntry entry, long? userId)
@@ -94,13 +88,78 @@ namespace MultiTenancyDemo.Data
             CheckAndBaseProperty(entry.Entity);
         }
 
-        protected virtual void ApplyAbpConceptsForModifiedEntity(EntityEntry entry, long? userId)
+        protected virtual void ApplyConceptsForModifiedEntity(EntityEntry entry, long? userId)
         {
             CheckAndSetMustHaveTenantIdProperty(entry.Entity);
             CheckAndSetMayHaveTenantIdProperty(entry.Entity);
             CheckAndUpdateBaseProperty(entry.Entity);
         }
 
+        protected virtual void ApplyConceptsForDeletedEntity(EntityEntry entry, long? userId)
+        {
+            CancelDeletionForSoftDelete(entry);
+            SetDeletionAuditProperties(entry,userId);
+        }
+
+        protected virtual void SetDeletionAuditProperties(object entityAsObj, long? userId)
+        {
+            if (entityAsObj is IHasDeletionTime)
+            {
+                var entity = entityAsObj as IHasDeletionTime;
+
+                if (entity.DeletionTime == null)
+                {
+                    entity.DeletionTime = DateTime.Now;
+                }
+            }
+
+            if (entityAsObj is IDeletionAudited)
+            {
+                var entity = entityAsObj as IDeletionAudited;
+
+                if (entity.DeleterUserId != null)
+                {
+                    return;
+                }
+
+                if (userId == null)
+                {
+                    entity.DeleterUserId = null;
+                    return;
+                }
+
+                //Special check for multi-tenant entities
+                if (entity is IMayHaveTenant || entity is IMustHaveTenant)
+                {
+                    //Sets LastModifierUserId only if current user is in same tenant/host with the given entity
+                    if ((entity is IMayHaveTenant && (entity as IMayHaveTenant).TenantId == CurrentTenantId ||
+                        (entity is IMustHaveTenant && (entity as IMustHaveTenant).TenantId == CurrentTenantId)))
+                    {
+                        entity.DeleterUserId = userId;
+                    }
+                    else
+                    {
+                        entity.DeleterUserId = null;
+                    }
+                }
+                else
+                {
+                    entity.DeleterUserId = userId;
+                }
+            }
+        }
+
+        protected virtual void CancelDeletionForSoftDelete(EntityEntry entry)
+        {
+            if (!(entry.Entity is ISoftDelete))
+            {
+                return;
+            }
+
+            entry.Reload();
+            entry.State = EntityState.Modified;
+            (entry.Entity as ISoftDelete).IsDeleted = true;
+        }
         public virtual void CheckAndBaseProperty(object entity)
         {
             if(!(entity is IHasCreateTime))

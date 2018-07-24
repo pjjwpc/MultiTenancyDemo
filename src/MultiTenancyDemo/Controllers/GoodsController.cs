@@ -39,8 +39,6 @@ namespace MultiTenancyDemo.Controllers
             }
 
             var goods = await _repository.GetAll()
-               
-                .Include(g => g.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (goods == null)
             {
@@ -140,8 +138,6 @@ namespace MultiTenancyDemo.Controllers
             }
 
             var goods = await _repository.GetAll()
-                
-                .Include(g => g.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (goods == null)
             {
@@ -157,7 +153,8 @@ namespace MultiTenancyDemo.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var goods = await _repository.GetAll().FirstAsync(r=>r.Id==id);
-           
+           _repository.Remove(goods);
+           await _unitOfWork.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

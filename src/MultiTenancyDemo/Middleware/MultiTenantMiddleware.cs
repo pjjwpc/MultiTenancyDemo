@@ -32,7 +32,6 @@ namespace MultiTenancyDemo.Middleware
             Tenant tenant=tenantResolverProvider.GetTenant(context);
             tenant=tenant??defaultTenant;
             multiTenancyDemoUnitOfWork.SetTenantInfo(tenant);
-            _logger.LogError("开始识别租户");
             await _next.Invoke(context);
             _logger.LogError($"识别出租户信息\n TenantInfo:{JsonConvert.SerializeObject(tenant)}");
         }

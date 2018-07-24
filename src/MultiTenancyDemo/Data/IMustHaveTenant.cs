@@ -24,4 +24,14 @@ namespace MultiTenancyDemo.Data
     {
         System.DateTime UpdateTime{get;set;}
     }
+
+    public interface IHasDeletionTime
+    {
+        System.DateTime DeletionTime{get;set;}
+    }
+
+    public interface IDeletionAudited
+    {
+        long? DeleterUserId{get;set;}
+    }
 }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MultiTenancyDemo.Data
 {
-    public class Goods : IMustHaveTenant,IHasCreateTime,IHasUpdateTime
+    public class Goods : IMustHaveTenant,IHasCreateTime,IHasUpdateTime,ISoftDelete
     {
         public int Id{get;set;}
 
@@ -22,5 +22,6 @@ namespace MultiTenancyDemo.Data
         public GoodsStatus Status{get;set;}
         public DateTime CreateTime { get ;set; }
         public DateTime UpdateTime { get ;set; }
+        public bool IsDeleted { get ;set; }
     }
 }

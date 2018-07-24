@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,5 +21,9 @@ namespace MultiTenancyDemo.Repository
         Task<bool> CreateAsync(TEntity entity);
 
         Task UpdateAsync(TEntity entity);
+
+        bool Remove(TEntity entity);
+
+        bool RemoveRange(IList<TEntity> entities);
     }
 }

@@ -22,7 +22,6 @@ namespace MultiTenancyDemo.Middleware
         public Tenant GetTenant(HttpContext context)
         {
             string url = context.Request.Host.Host;
-            System.Console.WriteLine($"Url:{url}");
             Tenant tenant;
             if(TenantIdDic.TryGetValue(url,out tenant))
             {
@@ -30,16 +29,14 @@ namespace MultiTenancyDemo.Middleware
             }
             else
             {
-               tenant= _cacheManager.Get(url);
+               tenant = _cacheManager.Get(url);
                if(tenant==null)
                {
                    tenant=defaultTenant;
-                   TenantIdDic.TryAdd(url,defaultTenant);
                }
-               else
-               {
-                   TenantIdDic.TryAdd(url,tenant);
-               }
+               
+               TenantIdDic.TryAdd(url,tenant);
+               
                return tenant;
             }
         }

@@ -5,6 +5,7 @@ using MultiTenancyDemo.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using MultiTenancyDemo.Repository;
+using MultiTenancyDemo.Uow;
 
 namespace MultiTenancyDemo.Controllers
 {
@@ -13,20 +14,23 @@ namespace MultiTenancyDemo.Controllers
         private readonly IMultiTenantRepositoryBase<Order> _repository;
         private readonly IMultiTenantRepositoryBase<Tenant> _tenantRepository;
         private readonly IMultiTenantRepositoryBase<User> _userRepository;
+        private readonly IMultiTenancyDemoUnitOfWork _unitOfWork;
 
         public OrdersController(IMultiTenantRepositoryBase<Order> repository,
                IMultiTenantRepositoryBase<Tenant> tenantRepository,
-               IMultiTenantRepositoryBase<User> userRepository)
+               IMultiTenantRepositoryBase<User> userRepository,
+               IMultiTenancyDemoUnitOfWork unitOfWork)
         {
             _tenantRepository = tenantRepository;
             _userRepository = userRepository;
             _repository = repository;
+            _unitOfWork=unitOfWork;
         }
 
         // GET: Orders
         public async Task<IActionResult> Index()
         {
-            var multiTenancyDbContext = _repository.GetAll().Include(o => o.User);
+            var multiTenancyDbContext = _repository.GetAll();
             return View(await multiTenancyDbContext.ToListAsync());
         }
 
@@ -39,8 +43,6 @@ namespace MultiTenancyDemo.Controllers
             }
 
             var order = await _repository.GetAll()
-                
-                .Include(o => o.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
@@ -68,6 +70,7 @@ namespace MultiTenancyDemo.Controllers
             if (ModelState.IsValid)
             {
                 _repository.Create(order);
+                await _unitOfWork.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["TenantId"] = new SelectList(_tenantRepository.GetAll(), "Id", "Id");
@@ -110,6 +113,7 @@ namespace MultiTenancyDemo.Controllers
                 try
                 {
                     await _repository.UpdateAsync(order);
+                    await _unitOfWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -138,7 +142,6 @@ namespace MultiTenancyDemo.Controllers
             }
 
             var order = await _repository.GetAll()
-                .Include(o => o.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {

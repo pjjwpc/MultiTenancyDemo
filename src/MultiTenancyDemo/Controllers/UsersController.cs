@@ -23,7 +23,7 @@ namespace MultiTenancyDemo.Controllers
         // GET: Users
         public async Task<IActionResult> Index()
         {
-            var multiTenancyDbContext = _repository.GetAll();//.User.Include(u => u.Tenant);
+            var multiTenancyDbContext = _repository.GetAll();
             return View(await multiTenancyDbContext.ToListAsync());
         }
 
@@ -103,6 +103,7 @@ namespace MultiTenancyDemo.Controllers
                 try
                 {
                    await _repository.UpdateAsync(user);
+                   await _unitOfWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -145,7 +146,8 @@ namespace MultiTenancyDemo.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var user = await _repository.GetAll().FirstAsync(r=>r.Id==id);
-            
+             _repository.Remove(user);
+            await _unitOfWork.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
