@@ -37,9 +37,7 @@ namespace MultiTenancyDemo
             });
 
             #region Apollo相关
-
             string connection = Configuration.GetValue<string>("ConnectionString");
-            Console.WriteLine($"connection:{connection}");
             #endregion
 
             #region CacheManager
@@ -50,12 +48,13 @@ namespace MultiTenancyDemo
             
             services.AddDbContext<MultiTenancyDbContext>(options=>
             {
-                options.UseLoggerFactory(Mlogger);
+                options.UseLoggerFactory(Mlogger);//这里主要是为了打印EFCore生成的Sql
                 options.UseMySql(connection);
             });
 
             #region  多租户相关处理
             services.AddSingleton<ITenantResolverProvider,UrlTenantResolverProvider>();
+            //系统的租户类型，是否启用多租户
             services.AddSingleton(typeof(MultiTenantType),MultiTenantType.Tenant);
             services.AddScoped(typeof(IDbContextProvider<>),typeof(DbContextProvider<>));
             services.AddScoped<IMultiTenancyDemoUnitOfWork,MultiTenancyDemoUnitOfWork>();
