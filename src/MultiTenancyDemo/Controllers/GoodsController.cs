@@ -15,18 +15,19 @@ namespace MultiTenancyDemo.Controllers
     {
         private readonly IMultiTenantRepositoryBase<Goods> _repository;
         private readonly IMultiTenancyDemoUnitOfWork _unitOfWork;
-
+        private bool isLocal=false;
         public GoodsController(IMultiTenantRepositoryBase<Goods> repository
                               ,IMultiTenancyDemoUnitOfWork unitOfWork)
         {
             _repository = repository;
             _unitOfWork=unitOfWork;
+            isLocal=_unitOfWork.GetTenant().Id==-1;
         }
 
         // GET: Goods
         public async Task<IActionResult> Index()
         {
-            var multiTenancyDbContext = _repository.GetAll();
+            var multiTenancyDbContext =isLocal? _repository.GetAll().IgnoreQueryFilters(): _repository.GetAll();
             return View(await multiTenancyDbContext.ToListAsync());
         }
 
@@ -136,8 +137,8 @@ namespace MultiTenancyDemo.Controllers
             {
                 return NotFound();
             }
-
-            var goods = await _repository.GetAll()
+            var query=isLocal?_repository.GetAll().IgnoreQueryFilters():_repository.GetAll();
+            var goods = await query
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (goods == null)
             {
@@ -152,7 +153,10 @@ namespace MultiTenancyDemo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var goods = await _repository.GetAll().FirstAsync(r=>r.Id==id);
+            var query=isLocal?_repository.GetAll().IgnoreQueryFilters():_repository.GetAll();
+            var goods = await query.FirstAsync(r=>r.Id==id);
+            goods.Status= GoodsStatus.已下架;
+           await _repository.UpdateAsync(goods);
            _repository.Remove(goods);
            await _unitOfWork.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

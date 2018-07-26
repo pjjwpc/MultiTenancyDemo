@@ -247,6 +247,7 @@ namespace MultiTenancyDemo.Data
                     .Invoke(this, new object[] { modelBuilder, entityType });
             }
             modelBuilder.ConfigureMultiTenancyDbContext();
+            base.OnModelCreating(modelBuilder);
         }
 
         protected void ConfigureGlobalFilters<TEntity>(ModelBuilder modelBuilder, IMutableEntityType entityType)
